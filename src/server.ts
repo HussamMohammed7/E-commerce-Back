@@ -15,6 +15,12 @@ const PORT = 5050
 const URL = process.env.ATLAS_URL as string
 
 app.use(morgan('dev'))
+
+if (process.env.NODE_ENV==="development"){
+  app.use(myLogger)
+
+}
+
 app.use(myLogger)
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
@@ -38,3 +44,5 @@ mongoose
 app.listen(PORT, () => {
   console.log('Server running http://localhost:' + PORT)
 })
+
+export default app
