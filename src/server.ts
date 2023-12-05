@@ -20,8 +20,7 @@ if (process.env.NODE_ENV==="development"){
   app.use(myLogger)
 
 }
-
-app.use(myLogger)
+ 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
