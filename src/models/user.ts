@@ -16,6 +16,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
+  phone: {
+    type: String,
+    unique: true,
+  },
   password: {
     type: String,
     required: true,
@@ -34,6 +38,10 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  address: {
+    type: [String],
+  },
+  
   activationToken: {
     type: String,
   },

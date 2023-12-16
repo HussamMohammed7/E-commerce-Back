@@ -30,11 +30,9 @@ export function validateUser(req: Request, res: Response, next: NextFunction) {
 }
 export function validateUpdateUser(req: Request, res: Response, next: NextFunction) {
   const schema = zod.object({
-    new_first_name: zod.string().optional(), // Adjust validation as needed
-    new_last_name: zod.string().optional(),
-    new_email: zod.string().email().optional(),
-    new_password: zod.string().min(8).max(50).optional(), // Adjust the password constraints
-    new_avatar: zod.string().url().optional(),
+    first_name: zod.string().optional(), // Adjust validation as needed
+    last_name: zod.string().optional(),
+    avatar: zod.string().url().optional(),
   })
 
   try {

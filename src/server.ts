@@ -8,6 +8,7 @@ import categoriesRouter from './routers/category'
 import ordersRouter from './routers/orders'
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
+import cors from 'cors'
 
 config()
 const app = express()
@@ -20,7 +21,7 @@ if (process.env.NODE_ENV==="development"){
   app.use(myLogger)
 
 }
- 
+app.use(cors())
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 

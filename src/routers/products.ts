@@ -2,6 +2,7 @@ import express from 'express'
 const router = express.Router()
 import { createProduct, deleteProduct, getProducts, getProductbyId, updateProduct } from '../controllers/productController'
 import { validateProduct } from '../middlewares/validateProduct'
+import { checkAuth } from '../middlewares/checkAuth'
 
 //Get product 
 router.get('/', getProducts)

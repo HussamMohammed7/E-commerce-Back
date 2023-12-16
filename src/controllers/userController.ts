@@ -20,7 +20,7 @@ export const getAllUsers = async (req:Request, res:Response) => {
   const filter : Filter = {}
 
     const page = Number(req.query.page)||1
-    const perPage = Number(req.query.perPage) || 3
+    const perPage = Number(req.query.perPage) || 10
     const role = req.query.role
     console.log(page, perPage)
    
@@ -121,17 +121,17 @@ export const getAllUsers = async (req:Request, res:Response) => {
       })
     }
     // to compare hash password with the login passowrd
-    bcrypt.compare(password, user.password, (err, result) => {
+    bcrypt.compare(password, user.password, (err, isPassCorrect) => {
       if (err) {
         return res.status(401).json({
-          msg: 'Password is not correct ',
+          msg: 'Login failed',
         })
       }
-      if (result) {
+      if (isPassCorrect) {
         const token = jwt.sign(
           {
             email: user.email,
-            userId: user._id,
+            _id: user._id,
             role: user.role,
           },
           process.env.TOKEN_SECRET as string,
@@ -142,10 +142,11 @@ export const getAllUsers = async (req:Request, res:Response) => {
         return res.status(200).json({
           msg: 'Login is successful',
           token: token,
+          user: user,
         })
       } else {
         return res.status(401).json({
-          msg: 'Login is not successful',
+          msg: 'Password is not correct',
         })
       }
     })
@@ -187,6 +188,7 @@ export const getAllUsers = async (req:Request, res:Response) => {
 
 
   res.status(200).json(user)
+  
   } 
 
    export const DeleteOneUser = async (req:Request, res:Response) => {
@@ -207,20 +209,17 @@ export const getAllUsers = async (req:Request, res:Response) => {
 }
 
 export const updateUser = async (req:Request, res:Response) => {
-  const new_first_name = req.body.new_first_name
-  const new_last_name = req.body.new_last_name
-  const new_email = req.body.new_email
-  const new_password = req.body.new_password 
-  const new_avatar = req.body.new_avatar
+  const first_name = req.body.first_name
+  const last_name = req.body.last_name
+  const avatar = req.body.avatar
   const userId = req.params.userId
   
-  const hashedPassword = await bcrypt.hash(new_password, 10)
 
   const newUser= await User.findByIdAndUpdate(
     userId,
     {
-       first_name: new_first_name, last_name: new_last_name ,
-       email: new_email, password: hashedPassword , avatar: new_avatar
+       first_name: first_name, last_name: last_name ,
+        avatar: avatar
       },
     {
       new: true,
@@ -235,7 +234,7 @@ export const updateUser = async (req:Request, res:Response) => {
   }
 
   res.json({
-    User: newUser,
+    user: newUser,
   })
 }
 

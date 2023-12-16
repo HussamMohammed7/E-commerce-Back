@@ -8,18 +8,18 @@ import { checkAuth } from '../middlewares/checkAuth'
 const router = express.Router()
 
 //List all Users : work 
-router.get('/',checkAuth("admin"), getAllUsers)
+router.get('/',checkAuth('admin'), getAllUsers)
 
 //List one user : work 
 router.get('/:userId',validateUserID, getOneUser)
 
 
 //Delete User : work
-router.delete('/:userId',validateUserID,checkAuth("admin"), DeleteOneUser)
+router.delete('/:userId',checkAuth('admin'),validateUserID, DeleteOneUser)
 
 
 //Update user : Work
-router.put('/:userId',validateUserID,validateUpdateUser, updateUser)
+router.put('/:userId',checkAuth('admin'),validateUserID,validateUpdateUser, updateUser)
 
 //Add User : work
 router.post('/', addOneUser)

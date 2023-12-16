@@ -70,29 +70,42 @@ export const getProductbyId = async (req: Request, res: Response) => {
 
 //create  a product
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
-  const { name, description, quantity, price, image, variants, size, categories } = req.body
-  const product = new Product({
-    name,
-    description,
-    quantity,
-    price,
-    image,
-    variants,
-    size,
-    categories,
-  })
-  if (!name || !description || !price) {
-    next(ApiError.badRequest('Name , Description and price are requried'))
-    return
-  }
+  try {
+    const { name, description, quantity, price, image, variants, sizes, categories } = req.body;
 
-  await product.save()
-  res.status(201).json({
-    msg: 'product is created',
-    product: product,
-    category: categories,
-  })
-}
+    // Validate required fields
+    if (!name || !description || !price) {
+      throw new ApiError(400, 'Name, Description, and price are required');
+    }
+
+    // Create a new product instance
+    const product = new Product({
+      name,
+      description,
+      quantity,
+      price,
+      image,
+      variants,
+      sizes,
+      categories,
+    });
+
+    // Save the product to the database
+    await product.save();
+
+    // Respond with success message and created product details
+    res.status(201).json({
+      msg: 'Product created successfully',
+      product,
+      category: categories,
+    });
+  } catch (error) {
+    res.status(201).json({
+      msg: 'product is updated',
+      product: product,
+      }  );
+}}
+
 //Update new product
 export const updateProduct = async (req: Request, res: Response) => {
   const { productId } = req.params
