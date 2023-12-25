@@ -5,10 +5,11 @@ import Order from "../models/order";
 import {servicesGetOrder} from "../services/order";
 //-----done---
 export const validateCreateOrder=(req: Request, res: Response, next: NextFunction) =>{
+  console.log(req.body)
   const productSchema = z.object({
-    product: z.string(),
+    product: z.string().length(24),
+    price:z.number(),
     quantity:  z.number().default(1),
-    _id: z.string(),
   });
   const postSchema = z.object({
     userId: z.string().length(24),

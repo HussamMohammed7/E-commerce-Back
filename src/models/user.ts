@@ -38,10 +38,34 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  address: {
-    type: [String],
+  address: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      country:{
+        type: String,
+        required: true,
+      },
+      city:{
+        type: String,
+        required: true,
+      },
+      address:{
+        type: String,
+        required: true,
+      },
+      phone:{
+        type: Number,
+        required: true,
+      }
+     
+  }
+  ],
+  forgotPasswordToken: {
+    type: String,
   },
-  
   activationToken: {
     type: String,
   },

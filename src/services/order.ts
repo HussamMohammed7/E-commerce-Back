@@ -9,10 +9,11 @@ export const  servicesGetOrders=async(filter:Filter,sortOptions:SortOptions,page
 export const servicesGetOrder=async (orderId:string)=>{
     return await Order.findById(orderId).populate('products.product').populate('userId').exec()
 }
-export const servicesCreateOrder=  (userId:string,products:ProductInsideOrder[])=>{
+export const servicesCreateOrder=  (userId:string,products:ProductInsideOrder[],total:number)=>{
     const order=new Order({
         userId,
-        products
+        products,
+        total
     })
     return order.save()
 }

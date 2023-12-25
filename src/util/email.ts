@@ -34,3 +34,17 @@ export async function sendActivationEmail(userEmail: string, activationToken: st
   const info = await transporter.sendMail(mailOptions)
   return info
 }
+
+export async function sendForgotPasswordEmail(userEmail: string, forgetPasswordToken: string) {
+  const resetPasswordLink = `${process.env.MAILER_FORGOT_PASSWORD_DOMAIN}/forgot-password/${forgetPasswordToken}`  
+  console.log(process.env.MAILER_USER)
+  const mailOptions = {
+    from: process.env.MAILER_USER,
+    to: userEmail,
+    subject: 'forgot password ? ',
+    html: `<p>Hello,</p> <p>Click <a href="${resetPasswordLink}">here</a> to reset your password </p>`,
+  }
+
+  const info = await transporter.sendMail(mailOptions)
+  return info
+}

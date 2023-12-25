@@ -2,31 +2,38 @@ import Product from '../models/product'
 import ApiError from '../errors/ApiError'
 import { Request, Response, NextFunction } from 'express'
 import product from '../models/product'
+import mongoose, { Mongoose } from 'mongoose'
 
 type Filter = {
-  category?: string
+  categories?: { $in: string[] }
   name?: { $regex: RegExp }
 }
 type SortOptions = {
-  sort?: 'asc' | 'desc' | { name: number }
+  sort?: 'asc' | 'desc' | { name?: number; price?: number }
 }
+
 //Get ALL Products
 export const getProducts = async (req: Request, res: Response, next: NextFunction) => {
   const page = Number(req.query.page) || 1
   const perPage = Number(req.query.perPage) || 3
   const products = await Product.find().populate('categories')
-  const name = req.query.name
+  const name = req.query.searchName
   const sort = req.query.sort
   const category = req.query.category
   const filters: Filter = {}
   const sortOptions: SortOptions = {}
+  const sortOptionsPrice: SortOptions = {}
+
   if (category && typeof category === 'string') {
-    filters.category = category
+    filters.categories = { $in: [category] }
+  }
+  console.log(filters)
+  if (name && typeof name === 'string') {
+    console.log('searchName:', name)
+    filters.name = { $regex: new RegExp(name, 'i') }
+    console.log('filters:', filters)
   }
 
-  if (name && typeof name === 'string') {
-    filters.name = { $regex: new RegExp(name, 'i') }
-  }
   if (sort && typeof sort === 'string') {
     if (sort === 'asc') {
       sortOptions.sort = { name: 1 }
@@ -34,14 +41,24 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
     if (sort === 'desc') {
       sortOptions.sort = { name: -1 }
     }
+    if (sort === 'asc_price') {
+      sortOptionsPrice.sort = { price: 1 }
+    }
+    if (sort === 'desc_price') {
+      sortOptionsPrice.sort = { price: -1 }
+    }
   }
-  const totalProduct = await Product.countDocuments()
+  const totalProduct = await Product.countDocuments(filters)
   const totalPages = Math.ceil(totalProduct / perPage)
+
   const items = await Product.find(filters)
     .skip((page - 1) * perPage)
     .limit(perPage)
+    .sort(sortOptions.sort)
     .populate('categories')
 
+  console.log('items:', items)
+  console.log('category:', category)
   res.status(200).json({
     msg: 'products is returned ',
     products: Product,
@@ -59,8 +76,8 @@ export const getProductbyId = async (req: Request, res: Response) => {
     const product = await Product.findById(productId)
 
     res.status(200).json({
-      msg: "Product by Id",
-      productbyId: product
+      msg: 'Product by Id',
+      productbyId: product,
     })
   } catch (error) {
     console.error(error)
@@ -71,11 +88,11 @@ export const getProductbyId = async (req: Request, res: Response) => {
 //create  a product
 export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { name, description, quantity, price, image, variants, sizes, categories } = req.body;
+    const { name, description, quantity, price, image, variants, sizes, categories } = req.body
 
     // Validate required fields
     if (!name || !description || !price) {
-      throw new ApiError(400, 'Name, Description, and price are required');
+      throw new ApiError(400, 'Name, Description, and price are required')
     }
 
     // Create a new product instance
@@ -88,23 +105,24 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
       variants,
       sizes,
       categories,
-    });
+    })
 
     // Save the product to the database
-    await product.save();
+    await product.save()
 
     // Respond with success message and created product details
     res.status(201).json({
       msg: 'Product created successfully',
       product,
       category: categories,
-    });
+    })
   } catch (error) {
     res.status(201).json({
       msg: 'product is updated',
       product: product,
-      }  );
-}}
+    })
+  }
+}
 
 //Update new product
 export const updateProduct = async (req: Request, res: Response) => {
@@ -139,14 +157,14 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
   try {
     const result = await Product.deleteOne({
       _id: productId,
-    });
+    })
     if (result.deletedCount > 0) {
-      res.status(200).send({ msg: 'Product deleted successfully' });
+      res.status(200).send({ msg: 'Product deleted successfully' })
     } else {
-      res.status(404).json({ error: 'Product not found' });
+      res.status(404).json({ error: 'Product not found' })
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    console.error(error)
+    res.status(500).json({ error: 'Internal Server Error' })
   }
 }

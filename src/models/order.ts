@@ -22,7 +22,11 @@ const orderSchema = new mongoose.Schema({
       quantity:{
         type: Number,
         required: true,
-      }
+      },
+      price:{
+        type: Number,
+        required: true,
+      },
   }
   ],
   status:{
@@ -35,8 +39,11 @@ const orderSchema = new mongoose.Schema({
     type:Date,
     required:true,
     default:Date.now()
-  }
-
+  },
+  total:{
+    type: Number,
+    required: false,
+  },
 })
 
 export default mongoose.model<OrderDocument>('Order', orderSchema)

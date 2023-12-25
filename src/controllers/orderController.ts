@@ -14,6 +14,8 @@ import {servicesGetProduct, servicesUpdateProductQuantity} from "../services/pro
 export const createOrder = async (req: Request, res: Response, next: NextFunction) => {
     const {userId, products} = req.body
     const findUser = await servicesGetUser(userId)
+    console.log('userId: ',userId,'products: ',products)
+    let total=0
     let productsAndNewQuantity: { productId: string, newQuantity: number }[] = [];
 // check if the user is found
     if (findUser) {
@@ -24,18 +26,22 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
                 next(ApiError.badRequest(`This product (${productInStore.name}) does not have enough quantity`));
                 return;
             }
-            // if productInStore.quantity > item.quantity, add product id and new quantity to productsAndNewQuantity
+            total=(Number(item.price)*Number(item.quantity))+total
+            // console.log('item.product.price',item.price,'item.quantity :', item.quantity,'result : ',item.price*item.quantity)
             const newQuantity = productInStore.quantity - item.quantity;
-            productsAndNewQuantity.push({productId: item.product, newQuantity: newQuantity});
+            productsAndNewQuantity.push({productId: item.product,  newQuantity: newQuantity});
         }
         // update Quantity
         productsAndNewQuantity.forEach(async (item) => await servicesUpdateProductQuantity(item.productId, item.newQuantity))
         //create new  order
-        const order = await servicesCreateOrder(userId, products)
+        console.log(total,"total 1213")
+
+        const order = await servicesCreateOrder(userId, products,total)
+        console.log(order)
         //add this order to user
         await addOrderToUser(userId, order)
         res.status(201).json({
-            msg: 'create new order and added to user orders',
+            message: 'create new order and added to user orders',
             order: order,
         })
     } else {
@@ -68,7 +74,7 @@ export const getOrders = async (req: Request, res: Response) => {
     const totalPage = Math.ceil(totalItems / perPage)
 
     res.status(200).json({
-        msg: "order is returned ",
+        message: "order is returned ",
         page,
         perPage,
         totalItems,
@@ -82,7 +88,7 @@ export const deleteOrder = async (req: Request, res: Response, next: NextFunctio
     const isDelete = await servicesDeleteOrder(orderId)
     if (isDelete['deletedCount'] === 1) {
         res.status(201).json({
-            msg: 'order is deleted'
+            message: 'order is deleted'
         })
     } else {
         next(ApiError.badRequest("not found order id "))
@@ -94,7 +100,7 @@ export const getOrder = async (req: Request, res: Response, next: NextFunction) 
     const order = await servicesGetOrder(orderId)
     if (order != null) {
         res.status(200).json({
-            msg: "order is returned ",
+            message: "order is returned ",
             order: order
         })
     } else {
@@ -113,7 +119,7 @@ export const updateOrder = async (req: Request, res: Response, next: NextFunctio
         if (updateOrder) {
 
             res.status(200).json({
-                msg: "order is updated ",
+                message: "order is updated ",
                 order: updateOrder
             })
         } else {
@@ -125,5 +131,3 @@ export const updateOrder = async (req: Request, res: Response, next: NextFunctio
     }
 
 }
-
-
