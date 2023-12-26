@@ -23,17 +23,8 @@ if (process.env.NODE_ENV==="development"){
 }
 
 console.log('=======')
-const whitelist = ['http://localhost:3000', 'https://sda-onsite-frontend-project-umber.vercel.app']
-const corsOptions: CorsOptions = {
-  origin: function (origin, callback) {
-    if (origin && whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
-app.use(cors(corsOptions))
+
+app.use(cors({origin: '*'}))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
