@@ -8,7 +8,7 @@ import categoriesRouter from './routers/category'
 import ordersRouter from './routers/orders'
 import apiErrorHandler from './middlewares/errorHandler'
 import myLogger from './middlewares/logger'
-import cors from 'cors'
+import cors, { CorsOptions } from 'cors'
 
 config()
 const app = express()
@@ -21,7 +21,19 @@ if (process.env.NODE_ENV==="development"){
   app.use(myLogger)
 
 }
-app.use(cors())
+
+console.log('=======')
+const whitelist = ['http://localhost:3000', 'https://sda-onsite-frontend-project-umber.vercel.app']
+const corsOptions: CorsOptions = {
+  origin: function (origin, callback) {
+    if (origin && whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+app.use(cors(corsOptions))
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
